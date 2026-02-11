@@ -96,7 +96,6 @@ const GameZone: React.FC = () => {
     }
   };
 
-  // --- Tic Tac Toe Logic ---
   const calculateWinner = (squares: (string | null)[]) => {
     const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
     for (let i = 0; i < lines.length; i++) {
@@ -117,7 +116,6 @@ const GameZone: React.FC = () => {
   const winner = calculateWinner(board);
   const isDraw = !winner && board.every(cell => cell !== null);
 
-  // --- Quiz Interaction ---
   const handleQuizSubmit = () => {
     if (selectedOption === null) return;
     setIsQuizSubmitted(true);
@@ -154,8 +152,6 @@ const GameZone: React.FC = () => {
   };
 
   const handleDownloadReport = () => {
-    // Report downloading logic for QUIZ only
-    const finalScore = score.correct;
     const successRate = score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0;
     const reportHtml = `
       <!DOCTYPE html>
@@ -177,62 +173,57 @@ const GameZone: React.FC = () => {
   };
 
   return (
-    <section id="games" className="py-24 relative overflow-hidden bg-slate-950">
-      <div className="max-w-7xl mx-auto px-4 relative z-10">
+    <section id="games" className="py-24 relative overflow-hidden bg-slate-950 px-4">
+      <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-16 space-y-4">
           <h2 className="text-blue-500 font-bold uppercase tracking-[0.4em] text-[10px]">Neural Playzone</h2>
-          <h3 className="text-5xl font-black text-white italic tracking-tighter uppercase">Game <span className="text-blue-600">Zone</span></h3>
+          <h3 className="text-4xl sm:text-5xl font-black text-white italic tracking-tighter uppercase">Game <span className="text-blue-600">Zone</span></h3>
         </div>
 
         {!activeGame ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {[
               { id: 'TIC_TAC_TOE' as GameType, name: 'Tic Tac Toe', desc: 'Logic Battle', color: 'blue', action: () => setActiveGame('TIC_TAC_TOE') },
               { id: 'QUIZ' as GameType, name: 'ICT QUIZ', desc: 'AI Exam Engine', color: 'emerald', action: generateNewQuiz }
             ].map((g) => (
               <div key={g.name} onClick={g.action} className="group cursor-pointer">
-                <div className={`glass-card p-10 rounded-[50px] border-white/5 group-hover:border-${g.color}-500/50 transition-all duration-500 text-center space-y-6 group-hover:-translate-y-3 h-full flex flex-col justify-center`}>
-                  <div className={`w-16 h-16 mx-auto rounded-3xl bg-${g.color}-600/10 flex items-center justify-center text-${g.color}-500 group-hover:bg-${g.color}-600 group-hover:text-white transition-all shadow-xl`}>
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className={`glass-card p-8 sm:p-10 rounded-[40px] sm:rounded-[50px] border-white/5 group-hover:border-${g.color}-500/50 transition-all duration-500 text-center space-y-4 group-hover:-translate-y-2 h-full flex flex-col justify-center`}>
+                  <div className={`w-14 h-14 sm:w-16 sm:h-16 mx-auto rounded-2xl sm:rounded-3xl bg-${g.color}-600/10 flex items-center justify-center text-${g.color}-500 group-hover:bg-${g.color}-600 group-hover:text-white transition-all shadow-xl`}>
+                    <svg className="w-7 h-7 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       {g.id === 'TIC_TAC_TOE' ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16M9 4v16M15 4v16" /> : 
                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />}
                     </svg>
                   </div>
-                  <h4 className="text-2xl font-black text-white uppercase italic tracking-tighter">{g.name}</h4>
+                  <h4 className="text-xl sm:text-2xl font-black text-white uppercase italic tracking-tighter">{g.name}</h4>
                   <p className="text-slate-500 text-[9px] font-black uppercase tracking-widest">{g.desc}</p>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="relative glass-card rounded-[40px] sm:rounded-[60px] border-blue-500/20 min-h-[500px] sm:min-h-[600px] flex flex-col items-center justify-center p-6 sm:p-8 overflow-hidden animate-in zoom-in-95 duration-500" style={watermarkStyle}>
+          <div className="relative glass-card rounded-[40px] sm:rounded-[60px] border-blue-500/20 min-h-[450px] sm:min-h-[600px] flex flex-col items-center justify-center p-6 sm:p-12 overflow-hidden animate-in zoom-in-95 duration-500" style={watermarkStyle}>
             
-            <button onClick={resetSession} className="absolute top-6 right-6 p-3 bg-white/5 hover:bg-rose-500/20 text-slate-500 hover:text-rose-500 rounded-full transition-all z-30">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+            <button onClick={resetSession} className="absolute top-4 right-4 sm:top-8 sm:right-8 p-3 bg-white/5 hover:bg-rose-500/20 text-slate-500 hover:text-rose-500 rounded-full transition-all z-30">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
 
-            {activeGame === 'QUIZ' && (
-              <div className="absolute top-8 left-10 flex gap-4 z-20 hidden sm:flex">
-                 <div className="glass-card px-4 py-1.5 rounded-full border-emerald-500/20 text-[10px] font-black text-emerald-400">CORRECT: {score.correct}</div>
-                 <div className="glass-card px-4 py-1.5 rounded-full border-rose-500/20 text-[10px] font-black text-rose-400">WRONG: {score.wrong}</div>
-              </div>
-            )}
-
             {isLoadingQuiz ? (
-              <div className="flex flex-col items-center space-y-6 text-center">
-                <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                <h4 className="text-xl font-black text-white uppercase italic tracking-tighter">Preparing Question Set...</h4>
+              <div className="flex flex-col items-center space-y-6 text-center max-w-xs sm:max-w-none">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                <h4 className="text-lg sm:text-xl font-black text-white uppercase italic tracking-tighter leading-tight">
+                  Toufiq sir is preparing question<br/><span className="text-blue-500">Please Wait</span>
+                </h4>
               </div>
             ) : activeGame === 'TIC_TAC_TOE' ? (
-              <div className="flex flex-col items-center space-y-8">
+              <div className="flex flex-col items-center space-y-8 w-full">
                 <div className="text-center">
-                  <h4 className="text-3xl font-black text-white uppercase italic tracking-tighter mb-2">
+                  <h4 className="text-2xl sm:text-3xl font-black text-white uppercase italic tracking-tighter mb-2">
                     {winner ? `Winner: ${winner}` : isDraw ? 'Match Draw!' : `${isXNext ? 'X' : 'O'}'s Turn`}
                   </h4>
                   <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em]">Logical Combat Zone</p>
                 </div>
 
-                <div className="grid grid-cols-3 gap-3 sm:gap-4">
+                <div className="grid grid-cols-3 gap-2 sm:gap-4 max-w-[300px] sm:max-w-none">
                   {board.map((cell, i) => (
                     <button key={i} onClick={() => handleTTTClick(i)} className="w-20 h-20 sm:w-32 sm:h-32 bg-slate-900/50 border-2 border-white/5 rounded-2xl sm:rounded-3xl text-3xl sm:text-6xl font-black text-blue-500 hover:border-blue-500/50 transition-all flex items-center justify-center">
                       {cell}
@@ -240,21 +231,21 @@ const GameZone: React.FC = () => {
                   ))}
                 </div>
 
-                <div className="flex gap-4">
-                  <button onClick={() => setBoard(Array(9).fill(null))} className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-black uppercase tracking-widest text-[10px] transition-all shadow-xl">Reset Board</button>
-                  <button onClick={resetSession} className="px-8 py-3 glass-card border-white/10 text-white rounded-xl font-black uppercase tracking-widest text-[10px] transition-all">Close Game</button>
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto px-4">
+                  <button onClick={() => setBoard(Array(9).fill(null))} className="w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-black uppercase tracking-widest text-[10px] transition-all shadow-xl">Reset Board</button>
+                  <button onClick={resetSession} className="w-full sm:w-auto px-8 py-4 glass-card border-white/10 text-white rounded-xl font-black uppercase tracking-widest text-[10px] transition-all">Close Game</button>
                 </div>
               </div>
             ) : (
-              <div className="w-full max-w-3xl space-y-12">
+              <div className="w-full max-w-3xl space-y-8 sm:space-y-12">
                 <div className="space-y-4 text-center">
-                   <span className="bg-emerald-600 text-white px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">Question {currentQuizIdx + 1}/{dynamicQuiz.length}</span>
-                   <h4 className="text-2xl sm:text-3xl font-black text-white leading-tight italic">{dynamicQuiz[currentQuizIdx]?.question}</h4>
+                   <span className="bg-emerald-600 text-white px-3 py-1 rounded-full text-[8px] sm:text-[9px] font-black uppercase tracking-widest">Question {currentQuizIdx + 1}/{dynamicQuiz.length}</span>
+                   <h4 className="text-xl sm:text-3xl font-black text-white leading-tight italic">{dynamicQuiz[currentQuizIdx]?.question}</h4>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="grid grid-cols-1 gap-3">
                    {dynamicQuiz[currentQuizIdx]?.options.map((opt, i) => {
-                     let btnClass = "p-4 sm:p-6 rounded-2xl sm:rounded-[30px] border-2 text-left font-bold transition-all flex items-center justify-between text-sm sm:text-base ";
+                     let btnClass = "p-4 sm:p-6 rounded-2xl sm:rounded-[30px] border-2 text-left font-bold transition-all flex items-center justify-between text-xs sm:text-base min-h-[60px] sm:min-h-0 ";
                      if (isQuizSubmitted) {
                         if (i === dynamicQuiz[currentQuizIdx].correctAnswer) btnClass += "bg-emerald-500/20 border-emerald-500 text-emerald-400 ";
                         else if (i === selectedOption) btnClass += "bg-rose-500/20 border-rose-500 text-rose-400 ";
@@ -270,13 +261,13 @@ const GameZone: React.FC = () => {
                    })}
                 </div>
 
-                <div className="pt-8 border-t border-white/5">
+                <div className="pt-6 sm:pt-8 border-t border-white/5">
                    {!isQuizSubmitted ? (
-                     <button onClick={handleQuizSubmit} disabled={selectedOption === null} className="w-full py-5 bg-blue-600 text-white rounded-2xl sm:rounded-3xl font-black uppercase tracking-widest shadow-2xl disabled:opacity-30">Submit Logic</button>
+                     <button onClick={handleQuizSubmit} disabled={selectedOption === null} className="w-full py-4 sm:py-5 bg-blue-600 text-white rounded-2xl sm:rounded-3xl font-black uppercase tracking-widest shadow-2xl disabled:opacity-30 text-xs sm:text-sm">Submit Logic</button>
                    ) : (
-                     <button onClick={nextQuiz} className="w-full py-5 bg-emerald-600 text-white rounded-2xl sm:rounded-3xl font-black uppercase tracking-widest shadow-2xl flex items-center justify-center gap-3">
+                     <button onClick={nextQuiz} className="w-full py-4 sm:py-5 bg-emerald-600 text-white rounded-2xl sm:rounded-3xl font-black uppercase tracking-widest shadow-2xl flex items-center justify-center gap-3 text-xs sm:text-sm">
                        <span>{currentQuizIdx === dynamicQuiz.length - 1 ? 'Finish Exam' : 'Next Question'}</span>
-                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                       <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                      </button>
                    )}
                 </div>
@@ -288,26 +279,26 @@ const GameZone: React.FC = () => {
 
       {showSummary && (
         <div className="fixed inset-0 z-[500] flex items-center justify-center p-4 bg-slate-950/98 backdrop-blur-3xl animate-in zoom-in-95 duration-500">
-           <div className="glass-card w-full max-w-lg rounded-[60px] border-blue-500/20 p-10 sm:p-12 text-center space-y-10 relative overflow-hidden" style={watermarkStyle}>
-              <div className="space-y-4">
-                <h4 className="text-blue-500 font-bold uppercase tracking-[0.4em] text-[10px]">Session Report</h4>
-                <h3 className="text-4xl font-black text-white italic tracking-tighter uppercase">SCORE <span className="text-blue-600">SUMMARY</span></h3>
+           <div className="glass-card w-full max-w-lg rounded-[40px] sm:rounded-[60px] border-blue-500/20 p-8 sm:p-12 text-center space-y-8 sm:space-y-10 relative overflow-hidden" style={watermarkStyle}>
+              <div className="space-y-2 sm:space-y-4">
+                <h4 className="text-blue-500 font-bold uppercase tracking-[0.4em] text-[9px] sm:text-[10px]">Session Report</h4>
+                <h3 className="text-3xl sm:text-4xl font-black text-white italic tracking-tighter uppercase leading-none">SCORE <span className="text-blue-600">SUMMARY</span></h3>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                 <div className="glass-card p-6 sm:p-8 rounded-[40px] border-emerald-500/20">
-                    <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-1">Correct</p>
-                    <p className="text-4xl font-black text-white">{score.correct}</p>
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                 <div className="glass-card p-5 sm:p-8 rounded-[30px] sm:rounded-[40px] border-emerald-500/20">
+                    <p className="text-[9px] sm:text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-1">Correct</p>
+                    <p className="text-3xl sm:text-4xl font-black text-white">{score.correct}</p>
                  </div>
-                 <div className="glass-card p-6 sm:p-8 rounded-[40px] border-rose-500/20">
-                    <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">Wrong</p>
-                    <p className="text-4xl font-black text-white">{score.wrong}</p>
+                 <div className="glass-card p-5 sm:p-8 rounded-[30px] sm:rounded-[40px] border-rose-500/20">
+                    <p className="text-[9px] sm:text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">Wrong</p>
+                    <p className="text-3xl sm:text-4xl font-black text-white">{score.wrong}</p>
                  </div>
               </div>
 
               <div className="flex flex-col gap-3">
-                <button onClick={handleDownloadReport} className="w-full py-5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-3xl font-black uppercase tracking-widest shadow-2xl transition-all">Download PDF Report</button>
-                <button onClick={resetSession} className="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white rounded-3xl font-black uppercase tracking-widest shadow-2xl transition-all">Close & Exit</button>
+                <button onClick={handleDownloadReport} className="w-full py-4 sm:py-5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl sm:rounded-3xl font-black uppercase tracking-widest shadow-2xl transition-all text-xs sm:text-sm">Download PDF Report</button>
+                <button onClick={resetSession} className="w-full py-4 sm:py-5 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl sm:rounded-3xl font-black uppercase tracking-widest shadow-2xl transition-all text-xs sm:text-sm">Close & Exit</button>
               </div>
            </div>
         </div>

@@ -124,28 +124,28 @@ const Navbar: React.FC = () => {
 
       {isMobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 top-[60px] sm:top-[72px] bg-slate-950/98 backdrop-blur-3xl z-[150] overflow-y-auto pb-10 animate-in slide-in-from-top-4">
-          <div className="flex flex-col p-6 sm:p-10 space-y-2">
+          <div className="flex flex-col p-6 sm:p-10 space-y-1">
             {navLinks.map((link) => (
               <a 
                 key={link.id} 
                 href={link.href} 
                 onClick={() => setIsMobileMenuOpen(false)} 
-                className={`group flex items-center justify-between py-6 border-b border-white/5 hover:px-2 transition-all ${activeSection === link.id ? 'text-blue-500' : ''}`}
+                className={`group flex items-center justify-between py-5 border-b border-white/5 hover:px-2 transition-all ${activeSection === link.id ? 'text-blue-500' : ''}`}
               >
-                <span className="text-3xl sm:text-4xl font-black uppercase italic tracking-tighter">
+                <span className="text-2xl sm:text-4xl font-black uppercase italic tracking-tighter">
                   {link.name}
                 </span>
-                <svg className={`w-8 h-8 ${activeSection === link.id ? 'opacity-100' : 'opacity-0'} text-blue-600 group-hover:opacity-100 transition-all`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-6 h-6 sm:w-8 sm:h-8 ${activeSection === link.id ? 'opacity-100' : 'opacity-0'} text-blue-600 group-hover:opacity-100 transition-all`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </a>
             ))}
-            <div className="pt-10">
+            <div className="pt-8">
               <a 
                 href={enrollUrl} 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="block w-full text-center py-6 sm:py-8 bg-blue-600 text-white rounded-[32px] font-black uppercase tracking-[0.2em] shadow-3xl shadow-blue-600/30 text-lg"
+                className="block w-full text-center py-5 sm:py-8 bg-blue-600 text-white rounded-[24px] sm:rounded-[32px] font-black uppercase tracking-[0.2em] shadow-3xl shadow-blue-600/30 text-base sm:text-lg"
               >
                 {t('nav.enroll')}
               </a>
