@@ -1,0 +1,37 @@
+{
+  "name": "5 Minute ICT",
+  "short_name": "5MinICT",
+  "description": "Master ICT with Toufiq Sir. HSC and Admission ICT Simplified.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2103/2103633.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2103/2103633.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Code Playground",
+      "url": "/#playground",
+      "description": "Start practicing C programming"
+    },
+    {
+      "name": "Lecture Sheets",
+      "url": "/#sheets",
+      "description": "Download ICT PDF notes"
+    }
+  ]
+}
