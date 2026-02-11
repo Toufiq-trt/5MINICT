@@ -2,19 +2,19 @@
 import { GoogleGenAI } from "@google/genai";
 
 export const getGeminiClient = () => {
-  // Check both standard and potentially injected env variables
   const apiKey = process?.env?.API_KEY || (window as any).process?.env?.API_KEY;
   
   if (!apiKey) {
-    console.warn("Gemini API_KEY is missing. AI features will be limited.");
-    // Return a dummy client or handle it in the UI to prevent total crash
-    return new GoogleGenAI({ apiKey: "MISSING_KEY" });
+    console.error("Gemini API_KEY is missing from environment variables.");
+    throw new Error("API_KEY_MISSING");
   }
   return new GoogleGenAI({ apiKey });
 };
 
-// Use gemini-3-pro-preview for complex reasoning and personality depth
+// Main Chat Model
 export const CHAT_MODEL = 'gemini-3-pro-preview';
+// Flash is better for rapid tool-like simulations
+export const SIMULATOR_MODEL = 'gemini-3-flash-preview';
 
 export const CHAT_CONFIG = {
   systemInstruction: `You are Toufiq Sir, a mentor with two distinct souls. 
@@ -46,7 +46,7 @@ STRICT RULES:
 };
 
 export const C_SIMULATOR_PROMPT = `Act as a GCC-based C Code Logic Engine. 
-Analyze code and return JSON:
+Analyze code and return ONLY valid JSON:
 {
   "status": "success" | "error",
   "terminalOutput": "Output",

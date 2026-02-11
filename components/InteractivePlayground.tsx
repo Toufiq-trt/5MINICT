@@ -1,7 +1,7 @@
 
 import React, { useState, useRef } from 'react';
 import { useLanguage } from '../LanguageContext';
-import { getGeminiClient, C_SIMULATOR_PROMPT, CHAT_MODEL } from '../services/geminiService';
+import { getGeminiClient, C_SIMULATOR_PROMPT, SIMULATOR_MODEL } from '../services/geminiService';
 
 const InteractivePlayground: React.FC = () => {
   const { t } = useLanguage();
@@ -16,7 +16,6 @@ const InteractivePlayground: React.FC = () => {
     const textarea = e.currentTarget;
     const { selectionStart, selectionEnd, value } = textarea;
 
-    // 1. Tab Support
     if (e.key === 'Tab') {
       e.preventDefault();
       const start = textarea.selectionStart;
@@ -26,26 +25,6 @@ const InteractivePlayground: React.FC = () => {
       activeTab === 'html' ? setHtmlCode(textarea.value) : setCCode(textarea.value);
     }
 
-    // 2. HTML Auto-close Tags
-    if (activeTab === 'html' && e.key === '>') {
-      const lastTagMatch = value.substring(0, selectionStart).match(/<(\w+)[^>]*$/);
-      if (lastTagMatch) {
-        const tagName = lastTagMatch[1];
-        // Basic self-closing check
-        const selfClosing = ['img', 'br', 'hr', 'input', 'link', 'meta'].includes(tagName.toLowerCase());
-        if (!selfClosing) {
-          setTimeout(() => {
-            const currentPos = textarea.selectionStart;
-            const newValue = textarea.value.substring(0, currentPos) + `</${tagName}>` + textarea.value.substring(currentPos);
-            setHtmlCode(newValue);
-            textarea.value = newValue;
-            textarea.selectionStart = textarea.selectionEnd = currentPos;
-          }, 0);
-        }
-      }
-    }
-
-    // 3. Brackets & Quotes Auto-close
     const pairs: Record<string, string> = { '{': '}', '(': ')', '[': ']', '"': '"', "'": "'" };
     if (pairs[e.key]) {
       e.preventDefault();
@@ -59,20 +38,26 @@ const InteractivePlayground: React.FC = () => {
   const runCSimulation = async () => {
     if (!cCode.trim() || isCompiling) return;
     setIsCompiling(true);
-    setTerminalLog([{ type: 'cmd', text: 'Compiling with Toufiq Sir\'s Cloud GCC Engine...' }]);
+    setTerminalLog([{ type: 'cmd', text: 'Connecting to Cloud GCC Engine...' }]);
 
     try {
       const ai = getGeminiClient();
       const response = await ai.models.generateContent({
-        model: CHAT_MODEL,
+        model: SIMULATOR_MODEL,
         contents: `PROMPT: ${C_SIMULATOR_PROMPT}\n\nUSER CODE:\n${cCode}`,
       });
 
       const responseText = response.text || "{}";
-      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) throw new Error("Server communication error.");
+      // Better JSON extraction to handle Markdown formatting
+      const jsonStart = responseText.indexOf('{');
+      const jsonEnd = responseText.lastIndexOf('}') + 1;
       
-      const result = JSON.parse(jsonMatch[0]);
+      if (jsonStart === -1 || jsonEnd === -1) {
+        throw new Error("Invalid response format from engine.");
+      }
+      
+      const jsonStr = responseText.substring(jsonStart, jsonEnd);
+      const result = JSON.parse(jsonStr);
 
       if (result.status === 'success') {
         setTerminalLog([
@@ -82,11 +67,24 @@ const InteractivePlayground: React.FC = () => {
         ]);
       } else {
         setTerminalLog([
-          { type: 'err', text: `COMPILATION ERROR: ${result.toufiqExplanation || 'Logic failure.'}` }
+          { type: 'err', text: `COMPILATION FAILED:\n${result.toufiqExplanation || 'Unknown error.'}` }
         ]);
       }
-    } catch (error) {
-      setTerminalLog([{ type: 'err', text: 'Server connection timeout. Please try again.' }]);
+    } catch (error: any) {
+      console.error("Simulation error:", error);
+      let errorMsg = "System failure. Please check your internet or code.";
+      
+      if (error.message === "API_KEY_MISSING") {
+        errorMsg = "Error: API_KEY is missing. Please check your Netlify environment variables.";
+      } else if (error.message?.includes("401")) {
+        errorMsg = "Error: Unauthorized. Your API Key might be invalid.";
+      } else if (error.message?.includes("429")) {
+        errorMsg = "Error: Too many requests. Wait a moment, dear.";
+      } else if (error.message) {
+        errorMsg = `Engine Error: ${error.message}`;
+      }
+
+      setTerminalLog([{ type: 'err', text: errorMsg }]);
     } finally {
       setIsCompiling(false);
     }
@@ -111,7 +109,7 @@ const InteractivePlayground: React.FC = () => {
                <div className="absolute top-4 right-6 z-20">
                   {activeTab === 'c' && (
                     <button onClick={runCSimulation} disabled={isCompiling} className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all shadow-xl disabled:opacity-50 active:scale-95">
-                      {isCompiling ? 'Processing...' : 'Run Logic'}
+                      {isCompiling ? 'Compiling...' : 'Run Logic'}
                     </button>
                   )}
                </div>
