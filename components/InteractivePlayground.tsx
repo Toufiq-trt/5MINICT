@@ -6,8 +6,14 @@ import { getGeminiClient, C_SIMULATOR_PROMPT, SIMULATOR_MODEL } from '../service
 const InteractivePlayground: React.FC = () => {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<'html' | 'c'>('html');
-  const [htmlCode, setHtmlCode] = useState(`<!DOCTYPE html>\n<html>\n<head>\n  <style>\n    body { background: #020617; color: #3b82f6; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }\n    .box { border: 2px solid #1e293b; padding: 40px; border-radius: 24px; text-align: center; }\n  </style>\n</head>\n<body>\n  <div class="box">\n    <h1>5Min ICT Lab</h1>\n    <p>Live Code Playground</p>\n  </div>\n</body>\n</html>`);
-  const [cCode, setCCode] = useState(`#include <stdio.h>\n\nint main() {\n    printf("Logic is thinking...\\n");\n    int a = 5, b = 10;\n    printf("Sum of %d and %d is %d\\n", a, b, a+b);\n    return 0;\n}`);
+  const [htmlCode, setHtmlCode] = useState(`<!DOCTYPE html>
+<html>
+<body style="background:#020617; color:#3b82f6; text-align:center; padding:50px; font-family:sans-serif;">
+  <h1>Hello ICT!</h1>
+  <p>Logic is the beginning of wisdom.</p>
+</body>
+</html>`);
+  const [cCode, setCCode] = useState(`#include <stdio.h>\n\nint main() {\n    printf("Logic is thinking...\\n");\n    int a = 5, b = 10;\n    printf("Sum is %d\\n", a + b);\n    return 0;\n}`);
   const [terminalLog, setTerminalLog] = useState<{ type: 'cmd' | 'out' | 'err', text: string }[]>([]);
   const [isCompiling, setIsCompiling] = useState(false);
   const editorRef = useRef<HTMLTextAreaElement>(null);
@@ -90,11 +96,11 @@ const InteractivePlayground: React.FC = () => {
   };
 
   return (
-    <section id="playground" className="py-20 bg-slate-950 px-4">
+    <section id="playground" className="py-20 bg-slate-950 px-4 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-10">
           <h2 className="text-blue-500 font-bold uppercase tracking-widest text-[10px] mb-2">Development Lab</h2>
-          <h3 className="text-3xl font-black text-white italic tracking-tight">Interactive Code Engine</h3>
+          <h3 className="text-3xl font-black text-white italic tracking-tight uppercase">Interactive <span className="text-blue-600">Code</span> Engine</h3>
         </div>
 
         <div className="glass-card rounded-[30px] sm:rounded-[40px] overflow-hidden border border-white/10 flex flex-col min-h-[500px] lg:min-h-[600px] shadow-2xl relative">
@@ -104,7 +110,7 @@ const InteractivePlayground: React.FC = () => {
           </div>
 
           <div className="flex-1 flex flex-col lg:grid lg:grid-cols-2">
-            <div className="bg-slate-900/40 relative border-b lg:border-b-0 lg:border-r border-white/5 h-[350px] lg:h-auto">
+            <div className="bg-slate-900/40 relative border-b lg:border-b-0 lg:border-r border-white/5 h-[320px] lg:h-auto">
                <div className="absolute top-4 right-4 z-20">
                   {activeTab === 'c' && (
                     <button onClick={runCSimulation} disabled={isCompiling} className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-[8px] sm:text-[9px] font-black uppercase tracking-widest transition-all shadow-xl disabled:opacity-50 active:scale-95">
@@ -122,10 +128,10 @@ const InteractivePlayground: React.FC = () => {
               />
             </div>
             
-            <div className="bg-slate-950 p-4 sm:p-6 flex flex-col h-[350px] lg:h-auto">
+            <div className="bg-slate-950 p-4 sm:p-6 flex flex-col h-[320px] lg:h-auto">
               <div className="flex items-center space-x-2 mb-3 px-2">
                 <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div>
-                <span className="text-[8px] sm:text-[9px] font-black text-slate-500 uppercase tracking-widest">Live Result Stream</span>
+                <span className="text-[8px] sm:text-[9px] font-black text-slate-500 uppercase tracking-widest">Live Stream</span>
               </div>
               
               {activeTab === 'html' ? (
