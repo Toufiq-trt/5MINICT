@@ -2,9 +2,13 @@
 import { GoogleGenAI } from "@google/genai";
 
 export const getGeminiClient = () => {
-  const apiKey = process.env.API_KEY;
+  // Check both standard and potentially injected env variables
+  const apiKey = process?.env?.API_KEY || (window as any).process?.env?.API_KEY;
+  
   if (!apiKey) {
-    throw new Error("Missing API_KEY.");
+    console.warn("Gemini API_KEY is missing. AI features will be limited.");
+    // Return a dummy client or handle it in the UI to prevent total crash
+    return new GoogleGenAI({ apiKey: "MISSING_KEY" });
   }
   return new GoogleGenAI({ apiKey });
 };
