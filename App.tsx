@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { LanguageProvider, useLanguage } from './LanguageContext';
 import Navbar from './components/Navbar';
@@ -10,6 +11,9 @@ import Contact from './components/Contact';
 import AIAssistant from './components/AIAssistant';
 import PracticeBoard from './components/PracticeBoard';
 import InteractivePlayground from './components/InteractivePlayground';
+import BrandHeader from './components/BrandHeader';
+import LearningQuests from './components/LearningQuests';
+import GameZone from './components/GameZone';
 
 const MainLayout: React.FC = () => {
   const [isPracticeMode, setIsPracticeMode] = useState(false);
@@ -37,7 +41,7 @@ const MainLayout: React.FC = () => {
     return () => observer.disconnect();
   }, [isPracticeMode, lang]);
 
-  // Smooth scroll fix for Safari/Chrome/Firefox
+  // Smooth scroll fix
   useEffect(() => {
     const handleAnchorClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -59,7 +63,7 @@ const MainLayout: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-950 selection:bg-blue-500/30 selection:text-blue-200">
+    <div className="min-h-screen bg-slate-950 selection:bg-blue-500/30 selection:text-blue-200" id="home">
       <Navbar />
       
       <main className="relative z-10">
@@ -67,17 +71,29 @@ const MainLayout: React.FC = () => {
           <PracticeBoard onBack={() => setIsPracticeMode(false)} />
         ) : (
           <>
+            {/* Page 1: Brand & Introduction */}
             <div className="reveal">
+              <BrandHeader />
               <Teacher />
             </div>
+
+            {/* Page 2: Branding & Chapters Section (Hero) */}
             <div className="reveal delay-100">
               <Hero onStartPractice={() => setIsPracticeMode(true)} />
             </div>
+
+            {/* Subsequent Sections */}
             <div className="reveal">
               <Schedule />
             </div>
             <div className="reveal">
               <InteractivePlayground />
+            </div>
+            <div className="reveal">
+              <LearningQuests />
+            </div>
+            <div className="reveal">
+              <GameZone />
             </div>
             <div className="reveal">
               <Notes />

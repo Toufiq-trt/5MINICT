@@ -1,7 +1,5 @@
 {
   "name": "5 Minute ICT - Modern Coaching Platform",
   "description": "A high-performance, student-friendly one-page website for 5 Minute ICT coaching center, featuring teacher bios, course schedules, and an AI-powered ICT study assistant.",
-  "requestFramePermissions": [
-    "microphone"
-  ]
+  "requestFramePermissions": []
 }

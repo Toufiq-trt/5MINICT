@@ -7,7 +7,7 @@ const Teacher: React.FC = () => {
   const teacherPhotoUrl = "https://drive.google.com/thumbnail?id=1as-hKVb4YTplT5Mopv9COwlJEPUJlVvy&sz=w1000";
 
   return (
-    <section id="teacher" className="pt-24 pb-20 sm:pt-40 sm:pb-32 relative overflow-hidden">
+    <section id="teacher" className="pt-4 pb-20 sm:pt-8 sm:pb-32 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-24 items-center">
           {/* Photo Block - Order 1 on Mobile, Left on Desktop */}

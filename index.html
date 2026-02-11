@@ -1,16 +1,34 @@
+
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="bn" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>5 Minute ICT | Master ICT Easily</title>
+    <title>5 Minute ICT | Master ICT with Toufiq Sir</title>
     
-    <!-- PWA & Play Store Metadata -->
+    <!-- Primary Meta Tags -->
+    <meta name="title" content="5 Minute ICT | Master ICT Easily">
+    <meta name="description" content="Master HSC and Admission ICT with Md Toufiqur Rahman Toufiq (NIT Rourkela). Simplified logic, premium notes, and AI-powered learning.">
+    <meta name="keywords" content="ICT Coaching, Toufiq Sir, 5 Minute ICT, HSC ICT, C Programming, Number System, ICT Notes">
+    <meta name="author" content="Md Toufiqur Rahman Toufiq">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://5minuteict.com/">
+    <meta property="og:title" content="5 Minute ICT | The Knowledge Evolution">
+    <meta property="og:description" content="Converting ICT fear into love through simplified logic. Join Toufiq Sir's evolution map.">
+    <meta property="og:image" content="https://drive.google.com/thumbnail?id=1as-hKVb4YTplT5Mopv9COwlJEPUJlVvy&sz=w1200">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="5 Minute ICT | Master ICT Easily">
+    <meta property="twitter:description" content="Ditch the complexity. Master ICT logic in minutes with Toufiq Sir.">
+
+    <!-- PWA Metadata -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#020617">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="5Min ICT">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2103/2103633.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -44,7 +62,6 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        /* Classy Reveal Animations */
         .reveal {
             opacity: 0;
             transform: translateY(30px) scale(0.98);
@@ -69,38 +86,21 @@
         .glow-blue {
             box-shadow: 0 0 40px -10px rgba(59, 130, 246, 0.3);
         }
-
-        /* Staggered Delay Utilities */
-        .delay-100 { transition-delay: 100ms; }
-        .delay-200 { transition-delay: 200ms; }
-        .delay-300 { transition-delay: 300ms; }
-        .delay-400 { transition-delay: 400ms; }
-        .delay-500 { transition-delay: 500ms; }
-
     </style>
 <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@^19.2.4",
+    "react": "https://esm.sh/react@19.0.0",
+    "react-dom": "https://esm.sh/react-dom@19.0.0",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+    "@google/genai": "https://esm.sh/@google/genai@1.40.0",
     "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "react/": "https://esm.sh/react@^19.2.4/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.40.0"
+    "react/": "https://esm.sh/react@^19.2.4/"
   }
 }
 </script>
 </head>
 <body class="text-slate-200 tech-grid">
     <div id="root"></div>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').then(reg => {
-                    console.log('Service Worker registered successfully');
-                }).catch(err => {
-                    console.log('Service Worker registration failed:', err);
-                });
-            });
-        }
-    </script>
 </body>
 </html>

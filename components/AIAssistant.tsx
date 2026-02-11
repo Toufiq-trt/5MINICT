@@ -5,25 +5,33 @@ import { ChatMessage } from '../types';
 import { useLanguage } from '../LanguageContext';
 
 const AIAssistant: React.FC = () => {
-  const { lang, t } = useLanguage();
+  const { lang } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingType, setLoadingType] = useState<'thinking' | 'typing'>('thinking');
+  const [msgCount, setMsgCount] = useState(0);
   
   const scrollRef = useRef<HTMLDivElement>(null);
   const chatRef = useRef<any>(null);
   const teacherPhotoUrl = "https://drive.google.com/thumbnail?id=1as-hKVb4YTplT5Mopv9COwlJEPUJlVvy&sz=w1000";
 
-  // Reset Session on Close/Open
+  const ICT_KEYWORDS = [
+    'ict', 'html', 'css', 'programming', 'binary', 'decimal', 'hex', 'octal', 'gate', 
+    'flipflop', 'register', 'ram', 'database', 'sql', 'topology', 'network', 'bus', 
+    'cloud', 'biometric', 'vr', 'robotics', 'logic', 'chapter', 'c ', 'adder', 'encoder', 'decoder', 'program', 'loop', 'array', 'explain', 'what is'
+  ];
+
   useEffect(() => {
     if (isOpen) {
-      // Starting a fresh session every time it opens
-      setMessages([{ role: 'model', text: t('ai.intro') }]);
-      initChatSession();
-    } else {
-      // Clear references when closed to ensure a new session next time
-      chatRef.current = null;
+      if (messages.length === 0) {
+        // Initial Greeting as requested
+        setMessages([{ role: 'model', text: "Assalamu alaikum, I am Toufiq. Whats your name dear?" }]);
+      }
+      if (!chatRef.current) {
+        initChatSession();
+      }
     }
   }, [isOpen]);
 
@@ -39,75 +47,92 @@ const AIAssistant: React.FC = () => {
       chatRef.current = ai.chats.create({
         model: CHAT_MODEL,
         config: {
-          systemInstruction: CHAT_CONFIG.systemInstruction + `\nPreferred Language: ${lang === 'bn' ? 'Bengali' : 'English'}.`,
+          systemInstruction: CHAT_CONFIG.systemInstruction + `\nConversation Context: New user started. Pref Lang: ${lang === 'bn' ? 'Bengali' : 'English'}`,
           temperature: CHAT_CONFIG.temperature,
         }
       });
     } catch (err) {
-      console.error("AI Init Failed", err);
+      console.error("AI Initialization Error:", err);
     }
   };
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  const handleSend = async (customMsg?: string) => {
+    const textToSend = customMsg || input;
+    if (!textToSend.trim() || isLoading) return;
     
-    if (!chatRef.current) initChatSession();
+    if (!chatRef.current) {
+      initChatSession();
+    }
 
-    const currentInput = input;
-    setMessages(prev => [...prev, { role: 'user', text: currentInput }]);
+    // Determine personality/loading state
+    const lowerText = textToSend.toLowerCase();
+    const isICT = ICT_KEYWORDS.some(k => lowerText.includes(k));
+    setLoadingType(isICT ? 'thinking' : 'typing');
+
+    setMessages(prev => [...prev, { role: 'user', text: textToSend }]);
     setInput('');
     setIsLoading(true);
+    
+    setMsgCount(prev => prev + 1);
 
     try {
-      const response = await chatRef.current.sendMessage({ message: currentInput });
-      setMessages(prev => [...prev, { role: 'model', text: response.text || "Logic error!" }]);
+      const response = await chatRef.current.sendMessage({ message: textToSend });
+      const reply = response.text;
+      
+      if (reply) {
+        setMessages(prev => [...prev, { role: 'model', text: reply }]);
+      } else {
+        throw new Error("No response");
+      }
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'model', text: "কানেক্টিভিটি ইস্যু! অনুগ্রহ করে পুনরায় চেষ্টা করুন।" }]);
+      console.error("AI Send Error:", error);
+      // Silently re-init for better reliability
+      initChatSession();
+      setMessages(prev => [...prev, { role: 'model', text: "কানেক্টিভিটি একটু দুর্বল, dear। প্রশ্নটি আবার করবে কি?" }]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Helper to render text with buttons for links
   const renderMessage = (text: string) => {
-    // Regex to find [LINK: Label | URL] or raw URLs
-    const linkRegex = /\[LINK:\s*(.*?)\s*\|\s*(.*?)\]|https?:\/\/[^\s]+/g;
-    const parts = text.split(linkRegex);
-    const matches = Array.from(text.matchAll(linkRegex));
+    return text.split('\n').map((line, li) => {
+      const isHeader = line.includes('🧠') || line.includes('📖') || line.includes('🌟') || line.startsWith('**');
+      
+      return (
+        <div key={li} className={`${isHeader ? 'mt-4 mb-2 text-blue-400 font-black' : 'mb-2'}`}>
+          {line.split(/(\[LINK:.*?\]|https?:\/\/[^\s]+)/g).map((part, pi) => {
+            const linkMatch = part.match(/\[LINK:\s*(.*?)\s*\|\s*(.*?)\]/);
+            const rawUrlMatch = part.match(/https?:\/\/[^\s]+/);
 
-    if (matches.length === 0) return text;
+            if (linkMatch) {
+              const label = linkMatch[1];
+              const url = linkMatch[2];
+              return (
+                <a key={pi} href={url} target="_blank" rel="noreferrer" className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest my-1 transition-all shadow-lg active:scale-95">
+                  <span>{label}</span>
+                </a>
+              );
+            }
+            if (rawUrlMatch) {
+              const url = rawUrlMatch[0];
+              const label = url.includes('wa.me') ? 'WhatsApp' : url.includes('facebook') ? 'Facebook' : 'Visit Link';
+              return (
+                <a key={pi} href={url} target="_blank" rel="noreferrer" className="inline-flex items-center space-x-2 bg-slate-800 hover:bg-slate-700 text-blue-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest my-1 border border-white/5 transition-all">
+                  <span>{label}</span>
+                </a>
+              );
+            }
 
-    let matchIdx = 0;
-    return text.split('\n').map((line, li) => (
-      <div key={li} className="mb-2">
-        {line.split(/(\[LINK:.*?\]|https?:\/\/[^\s]+)/g).map((part, pi) => {
-          const linkMatch = part.match(/\[LINK:\s*(.*?)\s*\|\s*(.*?)\]/);
-          const rawUrlMatch = part.match(/https?:\/\/[^\s]+/);
+            let content = part;
+            if (part.startsWith('**') && part.endsWith('**')) {
+              content = part.replace(/\*\*/g, '');
+            }
 
-          if (linkMatch) {
-            const label = linkMatch[1];
-            const url = linkMatch[2];
-            return (
-              <a key={pi} href={url} target="_blank" rel="noreferrer" className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest my-1 transition-all shadow-lg active:scale-95">
-                <span>{label}</span>
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </a>
-            );
-          }
-          if (rawUrlMatch) {
-            const url = rawUrlMatch[0];
-            const label = url.includes('wa.me') ? 'WhatsApp' : url.includes('facebook') ? 'Facebook' : 'Visit Link';
-            return (
-              <a key={pi} href={url} target="_blank" rel="noreferrer" className="inline-flex items-center space-x-2 bg-slate-800 hover:bg-slate-700 text-blue-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest my-1 border border-white/5 transition-all">
-                <span>{label}</span>
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </a>
-            );
-          }
-          return part;
-        })}
-      </div>
-    ));
+            return content;
+          })}
+        </div>
+      );
+    });
   };
 
   return (
@@ -115,7 +140,7 @@ const AIAssistant: React.FC = () => {
       {!isOpen && (
         <div className="flex flex-col items-end group">
           <div className="mb-3 px-4 py-2 bg-white text-slate-950 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-2xl animate-bounce relative group-hover:bg-blue-600 group-hover:text-white transition-colors">
-            Ask Anything to Toufiq Sir
+            Ask Toufiq Sir Anything
             <div className="absolute -bottom-1 right-6 w-3 h-3 bg-inherit rotate-45"></div>
           </div>
           <button onClick={() => setIsOpen(true)} className="w-16 h-16 sm:w-20 sm:h-20 bg-blue-600 rounded-full shadow-2xl flex items-center justify-center border-4 border-white/10 glow-blue overflow-hidden transition-all hover:scale-110 active:scale-90">
@@ -130,11 +155,16 @@ const AIAssistant: React.FC = () => {
             <div className="flex items-center space-x-3">
               <img src={teacherPhotoUrl} className="w-12 h-12 rounded-2xl object-cover border-2 border-white/20 shadow-inner" alt="" />
               <div>
-                <h4 className="text-white font-black text-sm uppercase tracking-tight">Toufiq Sir AI</h4>
-                <div className="flex items-center space-x-1.5"><span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span><span className="text-[9px] text-blue-100 font-bold uppercase tracking-widest">Active Session</span></div>
+                <h4 className="text-white font-black text-sm uppercase tracking-tight">Toufiq Sir</h4>
+                <div className="flex items-center space-x-1.5">
+                  <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                  <span className="text-[9px] text-blue-100 font-bold uppercase tracking-widest">Available</span>
+                </div>
               </div>
             </div>
-            <button onClick={() => setIsOpen(false)} className="text-white/70 hover:text-white transition-colors p-2"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg></button>
+            <button onClick={() => setIsOpen(false)} className="text-white/70 hover:text-white transition-colors p-2">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
           </div>
 
           <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-950/40">
@@ -145,6 +175,7 @@ const AIAssistant: React.FC = () => {
                 </div>
               </div>
             ))}
+            
             {isLoading && (
               <div className="flex items-center space-x-2 px-2">
                 <div className="flex space-x-1">
@@ -152,7 +183,9 @@ const AIAssistant: React.FC = () => {
                   <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:0.2s]"></div>
                   <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:0.4s]"></div>
                 </div>
-                <span className="text-[10px] text-blue-400 font-black uppercase tracking-widest italic">Fast Analyzing...</span>
+                <span className="text-[10px] text-blue-400 font-black uppercase tracking-widest italic">
+                  {loadingType === 'thinking' ? 'Toufiq sir is thinking...' : 'Toufiq is typing...'}
+                </span>
               </div>
             )}
           </div>
@@ -163,14 +196,10 @@ const AIAssistant: React.FC = () => {
               value={input} 
               onChange={(e) => setInput(e.target.value)} 
               onKeyDown={(e) => e.key === 'Enter' && handleSend()} 
-              placeholder="আইসিটি লজিক জানতে চাও..." 
+              placeholder="সাজেশন বা মনের কথা বলো..." 
               className="flex-1 bg-white/5 border border-white/10 text-white text-sm p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-600 transition-all placeholder:text-slate-600" 
             />
-            <button 
-              onClick={handleSend} 
-              disabled={isLoading} 
-              className="bg-blue-600 text-white px-6 rounded-2xl hover:bg-blue-500 transition-all active:scale-95 disabled:opacity-50 shadow-lg shadow-blue-600/20"
-            >
+            <button onClick={() => handleSend()} disabled={isLoading} className="bg-blue-600 text-white px-6 rounded-2xl hover:bg-blue-500 transition-all active:scale-95 disabled:opacity-50 shadow-lg">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
             </button>
           </div>
