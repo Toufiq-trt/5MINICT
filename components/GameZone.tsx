@@ -31,9 +31,12 @@ const GameZone: React.FC = () => {
   const timerRef = useRef<number | null>(null);
 
   // --- TIC TAC TOE STATE ---
+  const [tttStatus, setTttStatus] = useState<'CONFIG' | 'PLAYING' | 'RESULT'>('CONFIG');
   const [tttBoard, setTttBoard] = useState<(string | null)[]>(Array(9).fill(null));
-  const [isPlayerTurn, setIsPlayerTurn] = useState(true);
+  const [currentPlayer, setCurrentPlayer] = useState<'X' | 'O'>('X');
   const [tttWinner, setTttWinner] = useState<string | null>(null);
+  const [player1Name, setPlayer1Name] = useState('');
+  const [player2Name, setPlayer2Name] = useState('');
 
   // --- WORD QUEST STATE ---
   const [wordQuestData, setWordQuestData] = useState({
@@ -287,7 +290,8 @@ const GameZone: React.FC = () => {
     setCurrentQ(0);
     setTttBoard(Array(9).fill(null));
     setTttWinner(null);
-    setIsPlayerTurn(true);
+    setTttStatus('CONFIG');
+    setCurrentPlayer('X');
   };
 
   const attendedCount = userAnswers.filter(a => a !== null).length;
@@ -309,33 +313,29 @@ const GameZone: React.FC = () => {
   };
 
   const handleTttClick = (idx: number) => {
-    if (tttBoard[idx] || tttWinner || !isPlayerTurn) return;
+    if (tttBoard[idx] || tttWinner) return;
     const newBoard = [...tttBoard];
-    newBoard[idx] = '1'; // Player uses '1' (binary theme)
+    newBoard[idx] = currentPlayer;
     setTttBoard(newBoard);
     
     const win = checkTttWinner(newBoard);
     if (win) {
       setTttWinner(win);
+      setTttStatus('RESULT');
     } else {
-      setIsPlayerTurn(false);
-      setTimeout(() => makeAiMove(newBoard), 500);
+      setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
     }
   };
 
-  const makeAiMove = (board: (string | null)[]) => {
-    const available = board.map((v, i) => v === null ? i : null).filter(v => v !== null) as number[];
-    if (available.length === 0) return;
-    
-    // Simple AI: Try to win or block player, else random
-    const newBoard = [...board];
-    const move = available[Math.floor(Math.random() * available.length)];
-    newBoard[move] = '0'; // AI uses '0'
-    setTttBoard(newBoard);
-    
-    const win = checkTttWinner(newBoard);
-    if (win) setTttWinner(win);
-    setIsPlayerTurn(true);
+  const startTttGame = () => {
+    if (player1Name.trim() && player2Name.trim()) {
+      setTttStatus('PLAYING');
+      setTttBoard(Array(9).fill(null));
+      setTttWinner(null);
+      setCurrentPlayer('X');
+    } else {
+      alert("Please enter both player names");
+    }
   };
 
   // --- WORD QUEST LOGIC ---
@@ -401,11 +401,11 @@ const GameZone: React.FC = () => {
                <h4 className="text-2xl font-black text-white italic uppercase">LEXICON</h4>
                <p className="text-slate-500 text-[9px] mt-2 uppercase tracking-widest font-bold">Tech Vocabulary</p>
             </button>
-            <button onClick={() => setActiveGame('TIC_TAC_TOE')} className="group glass-card p-10 rounded-[40px] text-center border-rose-500/20 hover:border-rose-500 transition-all shadow-xl">
+            <button onClick={() => { setActiveGame('TIC_TAC_TOE'); setTttStatus('CONFIG'); }} className="group glass-card p-10 rounded-[40px] text-center border-rose-500/20 hover:border-rose-500 transition-all shadow-xl">
                <div className="w-16 h-16 bg-rose-600/10 rounded-2xl flex items-center justify-center text-rose-500 mx-auto mb-6 group-hover:bg-rose-600 group-hover:text-white transition-all">
                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16M9 4v16"/></svg>
                </div>
-               <h4 className="text-2xl font-black text-white italic uppercase">NEON TTT</h4>
+               <h4 className="text-2xl font-black text-white italic uppercase">TIC TAC TOE</h4>
                <p className="text-slate-500 text-[9px] mt-2 uppercase tracking-widest font-bold">Logic Duel</p>
             </button>
           </div>
@@ -523,34 +523,101 @@ const GameZone: React.FC = () => {
             )}
 
             {activeGame === 'TIC_TAC_TOE' && (
-              <div className="flex-1 flex flex-col items-center justify-center p-6 space-y-8 animate-in fade-in">
-                <div className="text-center">
-                   <h4 className="text-3xl font-black text-white italic uppercase tracking-tighter">NEON <span className="text-rose-500">BINARY</span> DUEL</h4>
-                   <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-2">Player: 1 | AI: 0</p>
-                </div>
-                
-                <div className="grid grid-cols-3 gap-3">
-                  {tttBoard.map((cell, i) => (
-                    <button 
-                      key={i} 
-                      onClick={() => handleTttClick(i)}
-                      className={`w-20 h-20 sm:w-28 sm:h-28 rounded-3xl flex items-center justify-center text-4xl font-black border-2 transition-all shadow-xl ${
-                        cell === '1' ? 'border-blue-500 bg-blue-500/10 text-blue-500 shadow-blue-500/20' : 
-                        cell === '0' ? 'border-rose-500 bg-rose-500/10 text-rose-500 shadow-rose-500/20' : 
-                        'border-white/5 bg-slate-900 hover:border-white/20'
-                      }`}
-                    >
-                      {cell}
-                    </button>
-                  ))}
-                </div>
+              <div className="flex-1 flex flex-col items-center justify-center p-6 h-full">
+                {tttStatus === 'CONFIG' && (
+                  <div className="flex-1 flex flex-col items-center justify-center space-y-8 animate-in fade-in zoom-in-95 w-full max-w-sm">
+                    <h4 className="text-4xl font-black text-white italic uppercase tracking-tighter">TIC TAC TOE</h4>
+                    <div className="w-full space-y-4">
+                      <div className="space-y-1">
+                        <label className="text-[10px] text-blue-500 font-black uppercase tracking-widest ml-4">Player 1 (X)</label>
+                        <input 
+                          type="text" 
+                          value={player1Name}
+                          onChange={(e) => setPlayer1Name(e.target.value)}
+                          placeholder="Enter Player 1 Name" 
+                          className="w-full bg-slate-900 border border-white/10 p-5 rounded-3xl text-white font-bold focus:border-blue-600 outline-none transition-all text-center"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] text-rose-500 font-black uppercase tracking-widest ml-4">Player 2 (O)</label>
+                        <input 
+                          type="text" 
+                          value={player2Name}
+                          onChange={(e) => setPlayer2Name(e.target.value)}
+                          placeholder="Enter Player 2 Name" 
+                          className="w-full bg-slate-900 border border-white/10 p-5 rounded-3xl text-white font-bold focus:border-rose-600 outline-none transition-all text-center"
+                        />
+                      </div>
+                      <button 
+                        onClick={startTttGame}
+                        className="w-full py-6 bg-white text-slate-950 rounded-3xl font-black uppercase tracking-widest text-xs hover:bg-blue-500 hover:text-white transition-all shadow-xl"
+                      >
+                        Start Duel
+                      </button>
+                    </div>
+                  </div>
+                )}
 
-                {tttWinner && (
-                  <div className="text-center animate-in zoom-in">
-                    <p className={`text-2xl font-black italic uppercase ${tttWinner === 'Draw' ? 'text-slate-400' : tttWinner === '1' ? 'text-blue-500' : 'text-rose-500'}`}>
-                      {tttWinner === 'Draw' ? 'Logic Equilibrium (Draw)' : tttWinner === '1' ? 'Human Intelligence Wins!' : 'AI System Dominance!'}
-                    </p>
-                    <button onClick={() => { setTttBoard(Array(9).fill(null)); setTttWinner(null); setIsPlayerTurn(true); }} className="mt-4 px-8 py-3 bg-white text-slate-950 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-xl">Re-Engage</button>
+                {tttStatus === 'PLAYING' && (
+                  <div className="flex-1 flex flex-col items-center justify-center space-y-8 animate-in fade-in">
+                    <div className="text-center space-y-2">
+                       <h4 className="text-2xl font-black text-white italic uppercase tracking-tighter">BATTLE <span className="text-blue-500">ARENA</span></h4>
+                       <div className="flex items-center gap-4 bg-slate-900 px-6 py-2 rounded-2xl border border-white/5">
+                          <span className={`text-sm font-black uppercase tracking-widest transition-all ${currentPlayer === 'X' ? 'text-blue-500 scale-110 underline' : 'text-slate-600'}`}>{player1Name} (X)</span>
+                          <span className="text-slate-700 font-black italic">VS</span>
+                          <span className={`text-sm font-black uppercase tracking-widest transition-all ${currentPlayer === 'O' ? 'text-rose-500 scale-110 underline' : 'text-slate-600'}`}>{player2Name} (O)</span>
+                       </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-3">
+                      {tttBoard.map((cell, i) => (
+                        <button 
+                          key={i} 
+                          onClick={() => handleTttClick(i)}
+                          className={`w-20 h-20 sm:w-28 sm:h-28 rounded-3xl flex items-center justify-center text-4xl font-black border-2 transition-all shadow-xl ${
+                            cell === 'X' ? 'border-blue-500 bg-blue-500/10 text-blue-500 shadow-blue-500/20' : 
+                            cell === 'O' ? 'border-rose-500 bg-rose-500/10 text-rose-500 shadow-rose-500/20' : 
+                            'border-white/5 bg-slate-900 hover:border-white/20'
+                          }`}
+                        >
+                          {cell}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button onClick={() => setTttStatus('CONFIG')} className="text-slate-500 text-[10px] font-black uppercase tracking-widest hover:text-white transition-all">Reset Players</button>
+                  </div>
+                )}
+
+                {tttStatus === 'RESULT' && (
+                  <div className="flex-1 flex flex-col items-center justify-center space-y-12 animate-in zoom-in h-full w-full">
+                    <style>{`
+                      @keyframes celebrate {
+                        0% { transform: scale(1) rotate(0deg); text-shadow: 0 0 10px rgba(59,130,246,0.5); }
+                        50% { transform: scale(1.1) rotate(2deg); text-shadow: 0 0 40px rgba(59,130,246,1); }
+                        100% { transform: scale(1) rotate(0deg); text-shadow: 0 0 10px rgba(59,130,246,0.5); }
+                      }
+                      .winning-name {
+                        animation: celebrate 1s infinite ease-in-out;
+                        background: linear-gradient(to bottom, #fff, #3b82f6);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                      }
+                    `}</style>
+                    <div className="text-center space-y-4">
+                      <h5 className="text-blue-500 font-black uppercase tracking-[0.5em] text-xs">Battle Outcome</h5>
+                      <h4 className={`text-5xl sm:text-7xl font-black italic uppercase tracking-tighter winning-name`}>
+                        {tttWinner === 'Draw' ? 'EQUILIBRIUM' : `${tttWinner === 'X' ? player1Name : player2Name} WINS!`}
+                      </h4>
+                      <p className="text-slate-500 font-bold text-sm uppercase tracking-widest">
+                        {tttWinner === 'Draw' ? 'A perfect logic stalemate' : 'System superiority established'}
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-4 w-full max-w-sm">
+                       <button onClick={() => { setTttBoard(Array(9).fill(null)); setTttWinner(null); setTttStatus('PLAYING'); setCurrentPlayer('X'); }} className="flex-1 py-5 bg-blue-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl hover:bg-blue-500 transition-all">Play Again</button>
+                       <button onClick={() => setTttStatus('CONFIG')} className="flex-1 py-5 bg-white/5 border border-white/10 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-white/10">Change Players</button>
+                    </div>
                   </div>
                 )}
               </div>
