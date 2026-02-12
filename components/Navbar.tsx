@@ -8,12 +8,14 @@ const Navbar: React.FC = () => {
   const [activeSection, setActiveSection] = useState('home');
   const { lang, setLang, t } = useLanguage();
 
+  // ScrollSpy and Navbar Background effect
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
       
-      const sections = ['home', 'teacher', 'about', 'schedule', 'playground', 'games', 'sheets', 'ebooks', 'contact'];
-      const scrollPosition = window.scrollY + 200;
+      // The IDs must match exactly what's in App.tsx
+      const sections = ['home', 'about', 'schedule', 'playground', 'games', 'sheets', 'ebooks', 'contact'];
+      const scrollPosition = window.scrollY + 250; // Offset for better detection
 
       for (const section of sections) {
         const el = document.getElementById(section);
@@ -28,17 +30,19 @@ const Navbar: React.FC = () => {
     };
 
     window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initial check
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Re-arranged to match page sequence in App.tsx
   const navLinks = [
-    { name: t('nav.mentor'), id: 'teacher', href: '#home' },
+    { name: t('nav.mentor'), id: 'home', href: '#home' },
     { name: t('nav.map'), id: 'about', href: '#about' },
+    { name: t('nav.batches'), id: 'schedule', href: '#schedule' },
     { name: t('nav.lab'), id: 'playground', href: '#playground' },
     { name: t('nav.gamezone'), id: 'games', href: '#games' },
-    { name: t('nav.batches'), id: 'schedule', href: '#schedule' },
-    { name: t('nav.library'), id: 'ebooks', href: '#ebooks' },
     { name: t('nav.sheets'), id: 'sheets', href: '#sheets' },
+    { name: t('nav.library'), id: 'ebooks', href: '#ebooks' },
     { name: t('nav.contact'), id: 'contact', href: '#contact' },
   ];
 
@@ -46,7 +50,7 @@ const Navbar: React.FC = () => {
   const closeMenu = () => setIsMobileMenuOpen(false);
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-[9999] transition-all duration-500 ${
+    <nav className={`fixed top-0 left-0 right-0 z-[10000] transition-all duration-500 ${
       isScrolled ? 'bg-slate-950/95 backdrop-blur-xl py-2 border-b border-white/5 shadow-2xl' : 'bg-transparent py-4'
     }`}>
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -74,15 +78,27 @@ const Navbar: React.FC = () => {
             </div>
           </div>
 
+          {/* Desktop Links */}
           <div className="hidden lg:flex items-center space-x-1">
             {navLinks.map((link) => (
-              <a key={link.id} href={link.href} className={`px-3 py-2 text-[10px] font-black uppercase tracking-widest transition-all rounded-xl ${activeSection === link.id || (link.id === 'teacher' && activeSection === 'home') ? 'text-blue-500 bg-blue-500/10' : 'text-slate-500 hover:text-white'}`}>{link.name}</a>
+              <a 
+                key={link.id} 
+                href={link.href} 
+                className={`px-3 py-2 text-[10px] font-black uppercase tracking-widest transition-all rounded-xl ${activeSection === link.id ? 'text-blue-500 bg-blue-500/10' : 'text-slate-500 hover:text-white'}`}
+              >
+                {link.name}
+              </a>
             ))}
             <a href={enrollUrl} target="_blank" rel="noopener noreferrer" className="ml-4 px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shrink-0">Enroll</a>
           </div>
 
-          <div className="lg:hidden">
-            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-white p-2.5 bg-white/5 rounded-xl border border-white/10 z-[10000] relative">
+          {/* Mobile Menu Toggle Button */}
+          <div className="lg:hidden flex items-center">
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+              className="text-white p-2.5 bg-white/5 rounded-xl border border-white/10 z-[10002] relative"
+              aria-label="Toggle Menu"
+            >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
               </svg>
@@ -91,17 +107,31 @@ const Navbar: React.FC = () => {
         </div>
       </div>
 
+      {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 bg-slate-950/98 backdrop-blur-2xl z-[9998] flex flex-col pt-24 pb-12 px-6 animate-in fade-in slide-in-from-top-4 duration-300">
+        <div className="lg:hidden fixed inset-0 bg-slate-950/98 backdrop-blur-2xl z-[10001] flex flex-col pt-24 pb-12 px-6 animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="flex-1 overflow-y-auto space-y-1">
             {navLinks.map((link) => (
-              <a key={link.id} href={link.href} onClick={closeMenu} className={`flex items-center justify-between py-5 border-b border-white/5 ${activeSection === link.id || (link.id === 'teacher' && activeSection === 'home') ? 'text-blue-500' : 'text-white/80'}`}>
+              <a 
+                key={link.id} 
+                href={link.href} 
+                onClick={closeMenu} 
+                className={`flex items-center justify-between py-5 border-b border-white/5 ${activeSection === link.id ? 'text-blue-500' : 'text-white/80'}`}
+              >
                 <span className="text-2xl font-black uppercase italic tracking-tighter">{link.name}</span>
                 <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeWidth="3" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
               </a>
             ))}
             <div className="pt-10">
-              <a href={enrollUrl} target="_blank" rel="noopener noreferrer" onClick={closeMenu} className="block w-full text-center py-5 bg-blue-600 text-white rounded-[20px] font-black uppercase tracking-[0.2em] shadow-3xl text-sm">Enroll Now</a>
+              <a 
+                href={enrollUrl} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                onClick={closeMenu} 
+                className="block w-full text-center py-5 bg-blue-600 text-white rounded-[20px] font-black uppercase tracking-[0.2em] shadow-3xl text-sm"
+              >
+                Enroll Now
+              </a>
             </div>
           </div>
         </div>
