@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../LanguageContext';
 import { GoogleGenAI, Type } from "@google/genai";
@@ -28,6 +29,34 @@ const GameZone: React.FC = () => {
   const [studentName, setStudentName] = useState('');
   const [timeLeft, setTimeLeft] = useState(25 * 60); 
   const timerRef = useRef<number | null>(null);
+
+  // --- TIC TAC TOE STATE ---
+  const [tttBoard, setTttBoard] = useState<(string | null)[]>(Array(9).fill(null));
+  const [isPlayerTurn, setIsPlayerTurn] = useState(true);
+  const [tttWinner, setTttWinner] = useState<string | null>(null);
+
+  // --- WORD QUEST STATE ---
+  const [wordQuestData, setWordQuestData] = useState({
+    word: '',
+    scrambled: '',
+    hint: '',
+    userInput: '',
+    score: 0,
+    feedback: ''
+  });
+
+  const ictWords = [
+    { word: 'DATABASE', hint: 'Organized collection of data' },
+    { word: 'BINARY', hint: 'Base-2 number system' },
+    { word: 'ALGORITHM', hint: 'Step-by-step logic' },
+    { word: 'ROUTER', hint: 'Directs data in a network' },
+    { word: 'FIREWALL', hint: 'Network security system' },
+    { word: 'COMPILER', hint: 'Translates high-level code' },
+    { word: 'PROTOCOL', hint: 'Set of communication rules' },
+    { word: 'BOOLEAN', hint: 'True or False logic' },
+    { word: 'VARIABLE', hint: 'Stored value container' },
+    { word: 'NETWORK', hint: 'Connected group of computers' }
+  ];
 
   // --- QUIZ LOGIC ---
   const startTimer = () => {
@@ -137,12 +166,10 @@ const GameZone: React.FC = () => {
       const mins = Math.floor(timeTaken / 60);
       const secs = timeTaken % 60;
 
-      // --- HEADER (Single Header Rectangle) ---
-      doc.setFillColor(2, 6, 23); // Slate 950
+      doc.setFillColor(2, 6, 23); 
       doc.rect(0, 0, pageWidth, 45, 'F');
       doc.setTextColor(255, 255, 255);
       
-      // Center content within the header box
       doc.setFontSize(22);
       doc.setFont("helvetica", "bold");
       doc.text("5 MINUTE ICT by TOUFIQ SIR", pageWidth / 2, 20, { align: 'center' });
@@ -151,7 +178,6 @@ const GameZone: React.FC = () => {
       doc.setFont("helvetica", "normal");
       doc.text("ICT TEST REPORT CARD", pageWidth / 2, 32, { align: 'center' });
 
-      // --- STUDENT INFO ---
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(10);
       doc.text(`Student Name: ${studentName}`, 14, 55);
@@ -161,7 +187,6 @@ const GameZone: React.FC = () => {
       doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth - 14, 55, { align: 'right' });
       doc.text(`Version: ${quizLanguage.toUpperCase()}`, pageWidth - 14, 61, { align: 'right' });
 
-      // --- QUESTIONS (Attended Only) ---
       const attendedIndices = questions.map((_, i) => i).filter(i => userAnswers[i] !== null);
       const attendedList = attendedIndices.map(i => ({ ...questions[i], originalIdx: i }));
 
@@ -186,7 +211,6 @@ const GameZone: React.FC = () => {
         ];
       };
 
-      // Left Table
       autoTable(doc, {
         startY: 75,
         margin: { left: 10, right: pageWidth / 2 + 2 },
@@ -198,15 +222,14 @@ const GameZone: React.FC = () => {
           if (data.section === 'body' && data.column.index === 1) {
             const rowIndex = data.row.index;
             const qObj = leftCol[rowIndex];
-            if (userAnswers[qObj.originalIdx] === qObj.correctAnswer) doc.setTextColor(0, 128, 0); // Green
-            else doc.setTextColor(220, 0, 0); // Red
+            if (userAnswers[qObj.originalIdx] === qObj.correctAnswer) doc.setTextColor(0, 128, 0); 
+            else doc.setTextColor(220, 0, 0); 
           }
         }
       });
 
       const leftY = (doc as any).lastAutoTable.finalY;
 
-      // Right Table
       autoTable(doc, {
         startY: 75,
         margin: { left: pageWidth / 2 + 2, right: 10 },
@@ -226,7 +249,6 @@ const GameZone: React.FC = () => {
 
       const rightY = (doc as any).lastAutoTable.finalY;
 
-      // --- SIGNATURE FOOTER ---
       const footerY = Math.max(leftY, rightY, 255) + 15;
       
       doc.setTextColor(0, 0, 0);
@@ -235,7 +257,6 @@ const GameZone: React.FC = () => {
       doc.text(`Result: ${results.correct} Out of 25`, 14, footerY + 6);
 
       const sigX = pageWidth - 60;
-      // Draw signature above the mentor name
       try {
         doc.addImage(SIGNATURE_URL, 'JPEG', sigX + 5, footerY - 18, 40, 15);
       } catch (e) {
@@ -248,7 +269,6 @@ const GameZone: React.FC = () => {
       doc.text("TOUFIQ sir (Mentor)", pageWidth - 14, footerY + 6, { align: 'right' });
       doc.line(pageWidth - 65, footerY + 1, pageWidth - 14, footerY + 1);
 
-      // --- PREVIEW IN NEW TAB ---
       const blob = doc.output('blob');
       const url = URL.createObjectURL(blob);
       window.open(url, '_blank');
@@ -265,9 +285,94 @@ const GameZone: React.FC = () => {
     setQuestions([]);
     setUserAnswers([]);
     setCurrentQ(0);
+    setTttBoard(Array(9).fill(null));
+    setTttWinner(null);
+    setIsPlayerTurn(true);
   };
 
   const attendedCount = userAnswers.filter(a => a !== null).length;
+
+  // --- TIC TAC TOE LOGIC ---
+  const checkTttWinner = (board: (string | null)[]) => {
+    const lines = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6]
+    ];
+    for (let line of lines) {
+      const [a, b, c] = line;
+      if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+        return board[a];
+      }
+    }
+    return board.includes(null) ? null : 'Draw';
+  };
+
+  const handleTttClick = (idx: number) => {
+    if (tttBoard[idx] || tttWinner || !isPlayerTurn) return;
+    const newBoard = [...tttBoard];
+    newBoard[idx] = '1'; // Player uses '1' (binary theme)
+    setTttBoard(newBoard);
+    
+    const win = checkTttWinner(newBoard);
+    if (win) {
+      setTttWinner(win);
+    } else {
+      setIsPlayerTurn(false);
+      setTimeout(() => makeAiMove(newBoard), 500);
+    }
+  };
+
+  const makeAiMove = (board: (string | null)[]) => {
+    const available = board.map((v, i) => v === null ? i : null).filter(v => v !== null) as number[];
+    if (available.length === 0) return;
+    
+    // Simple AI: Try to win or block player, else random
+    const newBoard = [...board];
+    const move = available[Math.floor(Math.random() * available.length)];
+    newBoard[move] = '0'; // AI uses '0'
+    setTttBoard(newBoard);
+    
+    const win = checkTttWinner(newBoard);
+    if (win) setTttWinner(win);
+    setIsPlayerTurn(true);
+  };
+
+  // --- WORD QUEST LOGIC ---
+  const startWordQuest = () => {
+    const randomWord = ictWords[Math.floor(Math.random() * ictWords.length)];
+    const scrambled = randomWord.word.split('').sort(() => Math.random() - 0.5).join('');
+    setWordQuestData({
+      ...wordQuestData,
+      word: randomWord.word,
+      scrambled,
+      hint: randomWord.hint,
+      userInput: '',
+      feedback: ''
+    });
+  };
+
+  useEffect(() => {
+    if (activeGame === 'WORD_QUEST' && !wordQuestData.word) {
+      startWordQuest();
+    }
+  }, [activeGame]);
+
+  const handleWordSubmit = () => {
+    if (wordQuestData.userInput.toUpperCase() === wordQuestData.word) {
+      setWordQuestData(prev => ({
+        ...prev,
+        score: prev.score + 10,
+        feedback: 'Correct! Logic Engine Synchronized. ⚡'
+      }));
+      setTimeout(startWordQuest, 1500);
+    } else {
+      setWordQuestData(prev => ({
+        ...prev,
+        feedback: 'Logic mismatch. Try again, brother! ❌'
+      }));
+    }
+  };
 
   return (
     <section id="games" className="py-24 bg-slate-950 px-4 relative overflow-hidden">
@@ -289,15 +394,15 @@ const GameZone: React.FC = () => {
                <h4 className="text-2xl font-black text-white italic uppercase">ICT TEST</h4>
                <p className="text-slate-500 text-[9px] mt-2 uppercase tracking-widest font-bold">Board Standard Prep</p>
             </button>
-            <button onClick={() => setActiveGame('WORD_QUEST')} className="group glass-card p-10 rounded-[40px] text-center border-white/5 hover:border-blue-500/50 transition-all shadow-xl">
-               <div className="w-16 h-16 bg-blue-600/10 rounded-2xl flex items-center justify-center text-blue-400 mx-auto mb-6">
+            <button onClick={() => setActiveGame('WORD_QUEST')} className="group glass-card p-10 rounded-[40px] text-center border-blue-500/20 hover:border-blue-500 transition-all shadow-xl">
+               <div className="w-16 h-16 bg-blue-600/10 rounded-2xl flex items-center justify-center text-blue-400 mx-auto mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all">
                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5"/></svg>
                </div>
                <h4 className="text-2xl font-black text-white italic uppercase">LEXICON</h4>
                <p className="text-slate-500 text-[9px] mt-2 uppercase tracking-widest font-bold">Tech Vocabulary</p>
             </button>
-            <button onClick={() => setActiveGame('TIC_TAC_TOE')} className="group glass-card p-10 rounded-[40px] text-center border-white/5 hover:border-rose-500/50 transition-all shadow-xl">
-               <div className="w-16 h-16 bg-rose-600/10 rounded-2xl flex items-center justify-center text-rose-500 mx-auto mb-6">
+            <button onClick={() => setActiveGame('TIC_TAC_TOE')} className="group glass-card p-10 rounded-[40px] text-center border-rose-500/20 hover:border-rose-500 transition-all shadow-xl">
+               <div className="w-16 h-16 bg-rose-600/10 rounded-2xl flex items-center justify-center text-rose-500 mx-auto mb-6 group-hover:bg-rose-600 group-hover:text-white transition-all">
                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16M9 4v16"/></svg>
                </div>
                <h4 className="text-2xl font-black text-white italic uppercase">NEON TTT</h4>
@@ -417,12 +522,81 @@ const GameZone: React.FC = () => {
               </div>
             )}
 
-            {activeGame && activeGame !== 'QUIZ' && (
-              <div className="flex-1 flex flex-col items-center justify-center p-10 text-center space-y-6">
-                 <h4 className="text-3xl font-black text-white italic uppercase tracking-tighter">{activeGame} Arena Under Construction</h4>
-                 <button onClick={() => setActiveGame(null)} className="px-8 py-3 bg-white/5 border border-white/10 text-white rounded-xl font-bold uppercase text-[9px] tracking-widest">Back</button>
+            {activeGame === 'TIC_TAC_TOE' && (
+              <div className="flex-1 flex flex-col items-center justify-center p-6 space-y-8 animate-in fade-in">
+                <div className="text-center">
+                   <h4 className="text-3xl font-black text-white italic uppercase tracking-tighter">NEON <span className="text-rose-500">BINARY</span> DUEL</h4>
+                   <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-2">Player: 1 | AI: 0</p>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-3">
+                  {tttBoard.map((cell, i) => (
+                    <button 
+                      key={i} 
+                      onClick={() => handleTttClick(i)}
+                      className={`w-20 h-20 sm:w-28 sm:h-28 rounded-3xl flex items-center justify-center text-4xl font-black border-2 transition-all shadow-xl ${
+                        cell === '1' ? 'border-blue-500 bg-blue-500/10 text-blue-500 shadow-blue-500/20' : 
+                        cell === '0' ? 'border-rose-500 bg-rose-500/10 text-rose-500 shadow-rose-500/20' : 
+                        'border-white/5 bg-slate-900 hover:border-white/20'
+                      }`}
+                    >
+                      {cell}
+                    </button>
+                  ))}
+                </div>
+
+                {tttWinner && (
+                  <div className="text-center animate-in zoom-in">
+                    <p className={`text-2xl font-black italic uppercase ${tttWinner === 'Draw' ? 'text-slate-400' : tttWinner === '1' ? 'text-blue-500' : 'text-rose-500'}`}>
+                      {tttWinner === 'Draw' ? 'Logic Equilibrium (Draw)' : tttWinner === '1' ? 'Human Intelligence Wins!' : 'AI System Dominance!'}
+                    </p>
+                    <button onClick={() => { setTttBoard(Array(9).fill(null)); setTttWinner(null); setIsPlayerTurn(true); }} className="mt-4 px-8 py-3 bg-white text-slate-950 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-xl">Re-Engage</button>
+                  </div>
+                )}
               </div>
             )}
+
+            {activeGame === 'WORD_QUEST' && (
+              <div className="flex-1 flex flex-col items-center justify-center p-6 space-y-10 animate-in fade-in">
+                 <div className="text-center">
+                    <h4 className="text-3xl font-black text-white italic uppercase tracking-tighter">ICT <span className="text-blue-500">LEXICON</span></h4>
+                    <div className="flex justify-center gap-6 mt-3">
+                       <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Score: {wordQuestData.score}</span>
+                    </div>
+                 </div>
+
+                 <div className="w-full max-w-md bg-slate-900/50 p-8 rounded-[40px] border border-white/5 text-center space-y-6">
+                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Unscramble the term</p>
+                    <h5 className="text-4xl sm:text-5xl font-black text-white tracking-[0.2em] italic uppercase drop-shadow-2xl">
+                       {wordQuestData.scrambled}
+                    </h5>
+                    <div className="p-4 bg-blue-600/5 rounded-2xl border border-blue-600/10">
+                       <p className="text-blue-400 text-xs font-bold leading-relaxed italic">" {wordQuestData.hint} "</p>
+                    </div>
+                    <div className="space-y-4">
+                       <input 
+                         type="text" 
+                         value={wordQuestData.userInput}
+                         onChange={(e) => setWordQuestData({...wordQuestData, userInput: e.target.value})}
+                         placeholder="Enter answer..."
+                         className="w-full bg-slate-950 border border-white/10 p-5 rounded-3xl text-white font-bold text-center outline-none focus:border-blue-600 transition-all uppercase tracking-widest"
+                       />
+                       <button 
+                         onClick={handleWordSubmit}
+                         className="w-full py-5 bg-blue-600 text-white rounded-3xl font-black uppercase text-[10px] tracking-widest shadow-xl hover:bg-blue-500 transition-all"
+                       >
+                         Validate Logic
+                       </button>
+                    </div>
+                    {wordQuestData.feedback && (
+                      <p className={`text-xs font-black uppercase animate-in slide-in-from-bottom-2 ${wordQuestData.feedback.includes('❌') ? 'text-rose-500' : 'text-emerald-500'}`}>
+                         {wordQuestData.feedback}
+                      </p>
+                    )}
+                 </div>
+              </div>
+            )}
+
           </div>
         )}
       </div>
