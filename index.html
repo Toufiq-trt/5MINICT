@@ -6,35 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>5 Minute ICT | Master ICT with Toufiq Sir</title>
     
-    <!-- Primary Meta Tags -->
     <meta name="title" content="5 Minute ICT | Master ICT Easily">
     <meta name="description" content="Master HSC and Admission ICT with Md Toufiqur Rahman Toufiq (NIT Rourkela). Simplified logic, premium notes, and AI-powered learning.">
-    <meta name="keywords" content="ICT Coaching, Toufiq Sir, 5 Minute ICT, HSC ICT, C Programming, Number System, ICT Notes">
-    <meta name="author" content="Md Toufiqur Rahman Toufiq">
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://5minuteict.com/">
-    <meta property="og:title" content="5 Minute ICT | The Knowledge Evolution">
-    <meta property="og:description" content="Converting ICT fear into love through simplified logic. Join Toufiq Sir's evolution map.">
-    <meta property="og:image" content="https://drive.google.com/thumbnail?id=1as-hKVb4YTplT5Mopv9COwlJEPUJlVvy&sz=w1200">
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:title" content="5 Minute ICT | Master ICT Easily">
-    <meta property="twitter:description" content="Ditch the complexity. Master ICT logic in minutes with Toufiq Sir.">
-
-    <!-- PWA Metadata -->
+    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#020617">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2103/2103633.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&family=Hind+Siliguri:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         body {
@@ -44,17 +27,12 @@
             -webkit-tap-highlight-color: transparent;
         }
         .mono { font-family: 'JetBrains Mono', monospace; }
+        .bengali { font-family: 'Hind Siliguri', sans-serif; }
         
         .tech-grid {
             background-size: 50px 50px;
             background-image: linear-gradient(to right, rgba(59, 130, 246, 0.03) 1px, transparent 1px),
                               linear-gradient(to bottom, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, #60a5fa 0%, #22d3ee 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
 
         .glass-card {
@@ -65,28 +43,115 @@
 
         .reveal {
             opacity: 0;
-            transform: translateY(30px) scale(0.98);
-            filter: blur(10px);
-            transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
-            will-change: transform, opacity, filter;
+            transform: translateY(20px);
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .reveal-visible {
             opacity: 1;
-            transform: translateY(0) scale(1);
-            filter: blur(0);
+            transform: translateY(0);
         }
 
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
-            100% { transform: translateY(0px); }
+        /* CSE Themed Loader */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: #020617;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.4s ease;
         }
-        .float-anim { animation: float 6s ease-in-out infinite; }
 
-        .glow-blue {
-            box-shadow: 0 0 40px -10px rgba(59, 130, 246, 0.3);
+        .terminal-box {
+            width: 280px;
+            background: #0f172a;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.15);
+            margin-bottom: 24px;
         }
+
+        .terminal-header {
+            background: #1e293b;
+            padding: 8px 12px;
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .red { background: #f43f5e; }
+        .yellow { background: #f59e0b; }
+        .green { background: #10b981; }
+
+        .terminal-body {
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #3b82f6;
+            min-height: 80px;
+        }
+
+        .binary-line {
+            opacity: 0.4;
+            white-space: nowrap;
+            overflow: hidden;
+            animation: binary-slide 2s linear infinite;
+        }
+
+        @keyframes binary-slide {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .typing-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 14px;
+            background: #3b82f6;
+            margin-left: 4px;
+            animation: blink 0.8s infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .loader-message {
+            font-family: 'Hind Siliguri', sans-serif;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 18px;
+            text-align: center;
+            max-width: 300px;
+            line-height: 1.5;
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .progress-bar-container {
+            width: 200px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            animation: progress-anim 2.5s ease-out forwards;
+        }
+
+        @keyframes progress-anim {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
     </style>
 <script type="importmap">
 {
@@ -102,7 +167,46 @@
 </script>
 </head>
 <body class="text-slate-200 tech-grid">
+    <div id="loader">
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+            </div>
+            <div class="terminal-body">
+                <div class="binary-line">101101001101001010110101011010011010010101101010110100110100101011010</div>
+                <div style="margin-top: 10px;">
+                    <span style="color: #10b981;">root@toufiq_sir:</span><span style="color: #ffffff;">~#</span> 
+                    <span>init_logic_v3.sh</span><span class="typing-cursor"></span>
+                </div>
+                <div style="margin-top: 4px; opacity: 0.6; font-size: 9px;">> Loading Chapter_Logic_Engines...</div>
+            </div>
+        </div>
+        <div class="loader-message bengali">তৌফিক স্যার রেডি হচ্ছেন, খাতা কলম বের করো....</div>
+        <div class="progress-bar-container">
+            <div class="progress-fill"></div>
+        </div>
+    </div>
     <div id="root"></div>
+    <script type="module">
+        // Ensure loader disappears after max 3 seconds or window load
+        const removeLoader = () => {
+            const loader = document.getElementById('loader');
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.remove(), 400);
+            }
+        };
+
+        // Timeout fallback to ensure it doesn't stay more than 3 seconds
+        const loadTimeout = setTimeout(removeLoader, 3000);
+
+        window.addEventListener('load', () => {
+            // Give it a tiny bit of breath if loaded instantly to show the animation
+            setTimeout(removeLoader, 1500);
+        });
+    </script>
     <script type="module" src="index.tsx"></script>
 </body>
 </html>
