@@ -1,3 +1,4 @@
+
 import { Batch, Sheet } from './types';
 
 export const BATCHES: Batch[] = [
@@ -120,6 +121,14 @@ export const EBOOKS = [
     downloadUrl: 'https://drive.google.com/uc?export=download&id=1PAMhyizhGvsoyGNj5g55Ngo6SlK6Stpw',
     coverImage: 'https://drive.google.com/thumbnail?id=1ZjIFIUY_iejyshnaHE-hTPL9re3HEc5C&sz=w1000',
     description: 'Highly recommended for complex logic and programming shortcuts.'
+  },
+  {
+    id: 'eb3',
+    title: 'HSC ICT by Cambrian',
+    url: 'https://drive.google.com/file/d/1tLUqhXVWspKFB8tSJ0wAF7VYBZFRt3UP/view?usp=sharing',
+    downloadUrl: 'https://drive.google.com/uc?export=download&id=1tLUqhXVWspKFB8tSJ0wAF7VYBZFRt3UP',
+    coverImage: 'https://drive.google.com/thumbnail?id=1gVSABS_NiFEyn-LJwq9Huee6IJjhwq-C&sz=w1000',
+    description: 'Cambrian Publication ICT book. Comprehensive question bank for HSC.'
   }
 ];
 
