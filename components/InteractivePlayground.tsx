@@ -8,11 +8,12 @@ const InteractivePlayground: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'html' | 'c'>('html');
   const [htmlCode, setHtmlCode] = useState(`<!DOCTYPE html>
 <html>
-<body style="background:#020617; color:#3b82f6; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; font-family:sans-serif;">
-  <h1 style="font-size:2rem; border-bottom:2px solid;">Hello ICT!</h1>
+<body style="background:#020617; color:#3b82f6; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; margin:0; font-family:sans-serif;">
+  <h1 style="border-bottom:2px solid;">Hello ICT!</h1>
+  <p>Logic starts here.</p>
 </body>
 </html>`);
-  const [cCode, setCCode] = useState(`#include <stdio.h>\n\nint main() {\n    printf("Logic is thinking...\\n");\n    return 0;\n}`);
+  const [cCode, setCCode] = useState(`#include <stdio.h>\n\nint main() {\n    printf("Logic is thinking...\\n");\n    int a = 5, b = 10;\n    printf("Sum is %d\\n", a + b);\n    return 0;\n}`);
   const [terminalLog, setTerminalLog] = useState<{ type: 'cmd' | 'out' | 'err', text: string }[]>([]);
   const [isCompiling, setIsCompiling] = useState(false);
   const editorRef = useRef<HTMLTextAreaElement>(null);
@@ -70,7 +71,7 @@ const InteractivePlayground: React.FC = () => {
           <h3 className="text-3xl font-black text-white italic tracking-tight uppercase">Interactive <span className="text-blue-600">Lab</span></h3>
         </div>
 
-        <div className="glass-card rounded-[30px] overflow-hidden border border-white/10 flex flex-col min-h-[550px] lg:min-h-[600px] shadow-2xl">
+        <div className="glass-card rounded-[30px] overflow-hidden border border-white/10 flex flex-col min-h-[500px] lg:min-h-[600px] shadow-2xl">
           <div className="flex bg-slate-900/50 p-2 gap-2 border-b border-white/5">
             <button onClick={() => setActiveTab('html')} className={`flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${activeTab === 'html' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:bg-white/5'}`}>HTML</button>
             <button onClick={() => setActiveTab('c')} className={`flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${activeTab === 'c' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:bg-white/5'}`}>C Logic</button>
@@ -90,7 +91,7 @@ const InteractivePlayground: React.FC = () => {
                 value={activeTab === 'html' ? htmlCode : cCode} 
                 onChange={(e) => activeTab === 'html' ? setHtmlCode(e.target.value) : setCCode(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="w-full h-full bg-transparent text-blue-400 mono text-[13px] p-6 outline-none resize-none leading-relaxed"
+                className="w-full h-full bg-transparent text-blue-400 mono text-[12px] sm:text-[13px] p-6 outline-none resize-none leading-relaxed"
                 spellCheck="false"
               />
             </div>
@@ -106,7 +107,7 @@ const InteractivePlayground: React.FC = () => {
                   <iframe srcDoc={htmlCode} className="w-full h-full" title="HTML Preview" />
                 </div>
               ) : (
-                <div className="flex-1 bg-black rounded-2xl p-5 mono text-[12px] overflow-y-auto border border-white/5 shadow-inner">
+                <div className="flex-1 bg-black rounded-2xl p-4 sm:p-6 mono text-[11px] sm:text-[12px] overflow-y-auto border border-white/5 shadow-inner">
                   {terminalLog.length === 0 ? (
                     <p className="text-[10px] text-slate-700 font-black uppercase tracking-widest">Awaiting Command...</p>
                   ) : (

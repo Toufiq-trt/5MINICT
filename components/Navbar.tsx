@@ -41,7 +41,7 @@ const Navbar: React.FC = () => {
   const closeMenu = () => setIsMobileMenuOpen(false);
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-[5000] transition-all duration-700 ${
+    <nav className={`fixed top-0 left-0 right-0 z-[6000] transition-all duration-700 ${
       isScrolled ? 'bg-slate-950/98 backdrop-blur-2xl py-2 border-b border-white/5 shadow-2xl' : 'bg-transparent py-4 border-b border-transparent'
     }`}>
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -65,8 +65,8 @@ const Navbar: React.FC = () => {
               </div>
             </a>
             <div className="flex items-center bg-slate-900 rounded-full p-0.5 border border-white/5 shadow-inner">
-                <button onClick={() => setLang('en')} className={`px-2.5 py-1 rounded-full text-[8px] sm:text-[9px] font-black transition-all ${lang === 'en' ? 'bg-blue-600 text-white' : 'text-slate-600'}`}>EN</button>
-                <button onClick={() => setLang('bn')} className={`px-2.5 py-1 rounded-full text-[8px] sm:text-[9px] font-black transition-all ${lang === 'bn' ? 'bg-blue-600 text-white' : 'text-slate-600'}`}>বাং</button>
+                <button onClick={() => setLang('en')} className={`px-2.5 py-1 rounded-full text-[8px] sm:text-[9px] font-black transition-all ${lang === 'en' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-600'}`}>EN</button>
+                <button onClick={() => setLang('bn')} className={`px-2.5 py-1 rounded-full text-[8px] sm:text-[9px] font-black transition-all ${lang === 'bn' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-600'}`}>বাং</button>
             </div>
           </div>
 
@@ -78,7 +78,7 @@ const Navbar: React.FC = () => {
           </div>
 
           <div className="lg:hidden">
-            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-white p-2.5 bg-white/5 rounded-xl border border-white/10 z-[5100] relative">
+            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-white p-2.5 bg-white/5 rounded-xl border border-white/10 z-[6100] relative">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
               </svg>
@@ -88,7 +88,7 @@ const Navbar: React.FC = () => {
       </div>
 
       {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 bg-slate-950/99 backdrop-blur-3xl z-[5050] overflow-y-auto flex flex-col pt-24 pb-12 px-6 animate-in fade-in slide-in-from-top-4 duration-300">
+        <div className="lg:hidden fixed inset-0 bg-slate-950/99 backdrop-blur-3xl z-[6050] overflow-y-auto flex flex-col pt-24 pb-12 px-6 animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="space-y-1">
             {navLinks.map((link) => (
               <a key={link.id} href={link.href} onClick={closeMenu} className={`flex items-center justify-between py-5 border-b border-white/5 ${activeSection === link.id ? 'text-blue-500' : 'text-white/80'}`}>

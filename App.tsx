@@ -12,7 +12,6 @@ import AIAssistant from './components/AIAssistant';
 import PracticeBoard from './components/PracticeBoard';
 import InteractivePlayground from './components/InteractivePlayground';
 import BrandHeader from './components/BrandHeader';
-import LearningQuests from './components/LearningQuests';
 import GameZone from './components/GameZone';
 
 const MainLayout: React.FC = () => {
@@ -71,7 +70,7 @@ const MainLayout: React.FC = () => {
           <PracticeBoard onBack={() => setIsPracticeMode(false)} />
         ) : (
           <>
-            {/* Page 1: Brand & Introduction */}
+            {/* Page 1: Brand & Mentor Section (Designed for 100vh visibility) */}
             <div className="reveal">
               <BrandHeader />
               <Teacher />
@@ -88,9 +87,6 @@ const MainLayout: React.FC = () => {
             </div>
             <div className="reveal">
               <InteractivePlayground />
-            </div>
-            <div className="reveal">
-              <LearningQuests />
             </div>
             <div className="reveal">
               <GameZone />

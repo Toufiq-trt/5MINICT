@@ -2,18 +2,16 @@
 import { GoogleGenAI } from "@google/genai";
 
 export const getGeminiClient = () => {
-  const apiKey = process?.env?.API_KEY || (window as any).process?.env?.API_KEY;
-  
+  const apiKey = process.env.API_KEY;
   if (!apiKey) {
-    console.error("Gemini API_KEY is missing from environment variables.");
     throw new Error("API_KEY_MISSING");
   }
   return new GoogleGenAI({ apiKey });
 };
 
-// Main Chat Model
+// Main Chat Model - Using Pro for better reasoning
 export const CHAT_MODEL = 'gemini-3-pro-preview';
-// Flash is better for rapid tool-like simulations
+// Flash is better for rapid simulations
 export const SIMULATOR_MODEL = 'gemini-3-flash-preview';
 
 export const CHAT_CONFIG = {
